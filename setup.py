@@ -8,7 +8,7 @@ setup(
     license='',
     author='',
     description='',
-    requires_python='>=3.8',
+    requires_python='>=3.6',
     install_requires=[
         'datasets',
         'evaluate',
