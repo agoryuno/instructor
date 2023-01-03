@@ -105,12 +105,36 @@ def freeze_top_n_layers(model, target_layers):
 
 
 def argument_parsing(model_name: str,
-    parser: Optional[ArgumentParser] = None, 
-    default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS) -> TrainingArguments:
-    
-    training_conf = {}
+        output_dir: Optional[str] = None,
+        parser: Optional[ArgumentParser] = None,
+        config_path: Optional[str] = None,
+        default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS) -> TrainingArguments:
+    """
+    Builds a TrainingArguments object from default parameters and a config file.
+    The latter can be specified either as a command line argument or as a string,
+    depending on whether you are running the training script from the command line
+    of as a module.
+
+    All parameters have sensible defaults.
+
+    @param model_name: name of the model to be used for training.
+    @param output_dir: (optional) path to the output directory if you want to change it.
+    @param parser:  (optional) ArgumentParser object if the script was invoked from 
+        the command line.
+    @param config_path: (optional) path to the config file with training parameters if 
+        running as an imported module. If both this and a parser are specified, the
+        config file path will be taken from the 'config' argument of the parser
+        and this parameter will be ignored.
+    @param default_params: (optional) default training parameters - you don't really
+        need to change this.
+    """
+
     if parser:
         args = parser.parse_args()
+        config_path = args.config
+    
+    training_conf = {}
+    if config_path:
         with open(args.config, "r", encoding="utf-8") as f:
             training_conf = yaml.safe_load(f.read())
 
@@ -118,7 +142,9 @@ def argument_parsing(model_name: str,
     args_dict = {**default_params, \
         **{k: __DEFAULT_PARAMS_TYPES.get(k, lambda x: x)(v)
             for k, v in training_conf.items()}}
-    args_dict["output_dir"] = f"{model_name}-finetuned"
+    
+    output_dir = output_dir or f"{model_name}-finetuned"
+    args_dict["output_dir"] = output_dir
     return TrainingArguments(**args_dict)
 
 
