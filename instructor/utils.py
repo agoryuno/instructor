@@ -153,7 +153,7 @@ def argument_parsing(model_name: str,
 
     # Merge config params with defaults and fix types
     # Exclude the loss argument because it's not a TrainingArguments parameter
-    args_dict = {**{k: v for k,v in default_params if k != "loss"}, \
+    args_dict = {**{k: v for k,v in default_params.items() if k != "loss"}, \
         **{k: __DEFAULT_PARAMS_TYPES.get(k, lambda x: x)(v)
             for k, v in training_conf.items()}}
     
