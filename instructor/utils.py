@@ -155,14 +155,14 @@ def argument_parsing(parser: Optional[ArgumentParser] = None,
 
     This function returns a dictionary of all parameters and a ready to use
     TrainingArguments object.
-
-    @param output_dir: (optional) path to the output directory if you want to change it.
+    
     @param parser:  (optional) ArgumentParser object if the script was invoked from 
         the command line.
     @param config_path: (optional) path to the config file with training parameters if 
         running as an imported module. If both this and a parser are specified, the
         config file path will be taken from the 'config' argument of the parser
         and this parameter will be ignored.
+    @param output_dir: (optional) path to the output directory if you want to change it.
     @param default_params: (optional) default training parameters - you don't really
         need to change this.
     """

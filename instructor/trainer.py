@@ -99,7 +99,7 @@ def run_trainer(config_path: str = None, parser: ArgumentParser = None):
         args = parser.parse_args()
         config_path = args.config
 
-    training_conf, args = argument_parsing(config_path=config_path)
+    training_conf, kwargs = argument_parsing(config_path=config_path)
 
     model, params = load_model(training_conf)
     print (f"Model has {int(params/1e6)}M trainable parameters.")
@@ -124,15 +124,16 @@ def run_trainer(config_path: str = None, parser: ArgumentParser = None):
         drop_token_type="galactica" in training_conf["model_name"]
     )
     assert len(evals) > 0
+    
+    kwargs["train_dataset"] = train
+    kwargs["eval_dataset"] = eval
+    kwargs["data_collator"] = collate_fn
+    kwargs["tokenizer"] = tokenizer
+    kwargs["compute_metrics"] = compute_metrics
+    kwargs["model"] = model
     trainer = RankTrainer(
-        model,
-        args,
         loss_function=training_conf["loss"],
-        train_dataset=train,
-        eval_dataset=eval,
-        data_collator=collate_fn,
-        tokenizer=tokenizer,
-        compute_metrics=compute_metrics,
+        **kwargs,
     )
     trainer.train()
 
