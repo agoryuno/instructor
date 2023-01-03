@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
+from typing import Dict, Any, Optional
+from argparse import ArgumentParser
 
 import yaml
 from sklearn.model_selection import train_test_split
@@ -20,6 +22,16 @@ DEFAULT_PARAMS = {
         "gradient_checkpointing": False,
         "datasets": ["webgpt"],
     }
+
+__DEFAULT_PARAMS_TYPES = dict(
+    num_train_epochs=int,
+    learning_rate=float,
+    eval_steps=int,
+    max_length=int,
+    per_device_eval_batch_size=int,
+    per_device_train_batch_size=int,
+    gradient_accumulation_steps=int
+)
 
 def webgpt_return_format(row):
     res = {"question": row["question"]["full_text"]}
@@ -78,29 +90,20 @@ def freeze_top_n_layers(model, target_layers):
     return model
 
 
-def argument_parsing(parser):
-    default_params = {
-        "num_train_epochs": 4,
-        "learning_rate": 3e-5,
-        "eval_steps": 500,
-        "loss": "rank",
-        "max_length": 440,
-        "per_device_eval_batch_size": 5,
-        "per_device_train_batch_size": 8,
-        "gradient_accumulation_steps": 8,
-        "gradient_checkpointing": False,
-        "datasets": ["webgpt"],
-    }
-    args = parser.parse_args()
-    with open(args.config, "r", encoding="utf-8") as f:
-        training_conf = yaml.safe_load(f.read())
+def argument_parsing(parser: Optional[ArgumentParser] = None, 
+        default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS):
+    
+    training_conf = {}
+    if parser:
+        args = parser.parse_args()
+        with open(args.config, "r", encoding="utf-8") as f:
+            training_conf = yaml.safe_load(f.read())
 
-    params = {**default_params, **training_conf}
-    params["gradient_accumulation_steps"] = int(params["gradient_accumulation_steps"])
-    params["num_train_epochs"] = int(params["num_train_epochs"])
-    params["per_device_train_batch_size"] = int(params["per_device_train_batch_size"])
-    params["learning_rate"] = float(params["learning_rate"])
-    return params
+    # Merge config params with defaults, fix types and return
+    return {**default_params, \
+        **{k: __DEFAULT_PARAMS_TYPES.get(k, lambda x: x)(v)
+            for k, v in training_conf.items()}}
+
 
 
 if __name__ == "__main__":
