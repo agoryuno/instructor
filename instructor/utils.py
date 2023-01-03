@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 from argparse import ArgumentParser
 
 import yaml
@@ -117,7 +117,8 @@ def argument_parsing(model_name: str,
         output_dir: Optional[str] = None,
         parser: Optional[ArgumentParser] = None,
         config_path: Optional[str] = None,
-        default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS) -> TrainingArguments:
+        default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS) -> \
+            Tuple(Dict[str, Any], TrainingArguments):
     """
     Builds a TrainingArguments object from default parameters and a config file.
     The latter can be specified either as a command line argument or as a string,
@@ -125,6 +126,9 @@ def argument_parsing(model_name: str,
     of as a module.
 
     All parameters have sensible defaults.
+
+    This function returns a dictionary of all parameters and a ready to use
+    TrainingArguments object.
 
     @param model_name: name of the model to be used for training.
     @param output_dir: (optional) path to the output directory if you want to change it.
@@ -148,13 +152,14 @@ def argument_parsing(model_name: str,
             training_conf = yaml.safe_load(f.read())
 
     # Merge config params with defaults and fix types
-    args_dict = {**default_params, \
+    # Exclude the loss argument because it's not a TrainingArguments parameter
+    args_dict = {**{k: v for k,v in default_params if k != "loss"}, \
         **{k: __DEFAULT_PARAMS_TYPES.get(k, lambda x: x)(v)
             for k, v in training_conf.items()}}
     
     output_dir = output_dir or f"{model_name}-finetuned"
     args_dict["output_dir"] = output_dir
-    return TrainingArguments(**args_dict)
+    return args_dict, TrainingArguments(**args_dict)
 
 
 
