@@ -146,8 +146,10 @@ def argument_parsing(parser: Optional[ArgumentParser] = None,
         default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS) -> \
             Tuple[Dict[str, Any], TrainingArguments]:
     """
-    Builds a TrainingArguments object from default parameters and a config file.
-    The latter can be specified either as a command line argument or as a string,
+    Collects default parameters and the ones from a config file into a dict with 
+    full config options and a TrainingArguments object.
+    
+    Config file can be specified either as a command line argument or as a string,
     depending on whether you are running the training script from the command line
     of as a module.
 
