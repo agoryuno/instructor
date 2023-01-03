@@ -5,4 +5,4 @@ scikit-learn==1.2.0
 torch==1.12.1+cu116
 transformers==4.25.1
 wandb==0.13.7
-protobu==3.20.*
+protobuf==3.20.*
