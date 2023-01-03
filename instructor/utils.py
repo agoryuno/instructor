@@ -118,7 +118,7 @@ def argument_parsing(model_name: str,
         parser: Optional[ArgumentParser] = None,
         config_path: Optional[str] = None,
         default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS) -> \
-            Tuple(Dict[str, Any], TrainingArguments):
+            Tuple[Dict[str, Any], TrainingArguments]:
     """
     Builds a TrainingArguments object from default parameters and a config file.
     The latter can be specified either as a command line argument or as a string,
