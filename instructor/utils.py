@@ -8,7 +8,11 @@ import yaml
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Subset
 from torch.nn.modules.container import ModuleList
-from transformers import AutoTokenizer, TrainingArguments
+from transformers import (
+    AutoTokenizer, 
+    TrainingArguments, 
+    AutoModelForSequenceClassification
+)
 
 re_reference_remove = re.compile(r"\[\d+(?:,\s*\d+)*?\]")
 
