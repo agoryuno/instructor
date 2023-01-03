@@ -8,11 +8,7 @@ import torch
 
 from torch import nn
 from torch.utils.data import ConcatDataset
-from transformers import (
-    AutoModelForSequenceClassification,
-    Trainer,
-    TrainingArguments,
-)
+from transformers import Trainer
 
 from .rank_datasets import DataCollatorForPairRank, HFSummary, WebGPT
 from .utils import (
@@ -124,7 +120,8 @@ def run_trainer(config_path: str = None, parser: ArgumentParser = None):
         evals["hfsummary"] = sum_eval
     train = ConcatDataset(train_datasets)
     collate_fn = DataCollatorForPairRank(
-        tokenizer, max_length=training_conf["max_length"], drop_token_type="galactica" in model_name
+        tokenizer, max_length=training_conf["max_length"], 
+        drop_token_type="galactica" in training_conf["model_name"]
     )
     assert len(evals) > 0
     trainer = RankTrainer(

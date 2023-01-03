@@ -3,6 +3,7 @@ import re
 from typing import Dict, Any, Optional, Tuple
 from argparse import ArgumentParser
 
+import numpy as np
 import yaml
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Subset
