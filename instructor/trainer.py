@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
 import evaluate
 import numpy as np
 import torch
-from rank_datasets import DataCollatorForPairRank, HFSummary, WebGPT
+
 from torch import nn
 from torch.utils.data import ConcatDataset, Dataset
 from transformers import (
@@ -19,7 +19,9 @@ from transformers import (
     TrainerCallback,
     TrainingArguments,
 )
-from utils import argument_parsing, freeze_top_n_layers, get_tokenizer, train_val_dataset
+
+from .rank_datasets import DataCollatorForPairRank, HFSummary, WebGPT
+from .utils import argument_parsing, freeze_top_n_layers, get_tokenizer, train_val_dataset
 
 os.environ["WANDB_PROJECT"] = "reward-model"
 
