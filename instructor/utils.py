@@ -8,6 +8,18 @@ from transformers import AutoTokenizer
 
 re_reference_remove = re.compile(r"\[\d+(?:,\s*\d+)*?\]")
 
+DEFAULT_PARAMS = {
+        "num_train_epochs": 4,
+        "learning_rate": 3e-5,
+        "eval_steps": 500,
+        "loss": "rank",
+        "max_length": 440,
+        "per_device_eval_batch_size": 5,
+        "per_device_train_batch_size": 8,
+        "gradient_accumulation_steps": 8,
+        "gradient_checkpointing": False,
+        "datasets": ["webgpt"],
+    }
 
 def webgpt_return_format(row):
     res = {"question": row["question"]["full_text"]}

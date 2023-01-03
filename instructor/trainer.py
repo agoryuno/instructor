@@ -1,22 +1,16 @@
 import os
 from argparse import ArgumentParser
-from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 import evaluate
 import numpy as np
 import torch
 
 from torch import nn
-from torch.utils.data import ConcatDataset, Dataset
+from torch.utils.data import ConcatDataset
 from transformers import (
     AutoModelForSequenceClassification,
-    DataCollator,
-    EvalPrediction,
-    PreTrainedModel,
-    PreTrainedTokenizerBase,
     Trainer,
-    TrainerCallback,
     TrainingArguments,
 )
 
@@ -116,8 +110,7 @@ if __name__ == "__main__":
         warmup_steps=500,
         learning_rate=training_conf["learning_rate"],
         # half_precision_backend="apex",
-        #fp16=True,
-        fp16=False,
+        fp16=True,
         gradient_checkpointing=training_conf["gradient_checkpointing"],
         gradient_accumulation_steps=training_conf["gradient_accumulation_steps"],
         per_device_train_batch_size=training_conf["per_device_train_batch_size"],
