@@ -83,7 +83,16 @@ def train_val_dataset(dataset, val_split=0.2):
     return Subset(dataset, train_idx), Subset(dataset, val_idx)
 
 
-def freeze_top_n_layers(model, target_layers):
+def freeze_top_n_layers(model, target_layers: int):
+    """
+    Sets to False the `requires_grad` attribute of the first `target_layers` 
+    number of layers
+
+    @param model: the model to be frozen
+    @param target_layers: the number of layers to be frozen
+
+    @return: the partially frozen model
+    """
     # its possible we can simply detect which module is a ModuleList
     # and simply freeze the module without doing string parsing
 
