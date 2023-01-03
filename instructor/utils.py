@@ -144,7 +144,7 @@ def argument_parsing(model_name: str,
     
     training_conf = {}
     if config_path:
-        with open(args.config, "r", encoding="utf-8") as f:
+        with open(config_path, "r", encoding="utf-8") as f:
             training_conf = yaml.safe_load(f.read())
 
     # Merge config params with defaults and fix types
