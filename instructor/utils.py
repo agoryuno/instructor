@@ -162,7 +162,7 @@ def argument_parsing(model_name: str,
 
     # Exclude all extra arguments
     train_args = TrainingArguments(**{k: v for k, v in args_dict.items() 
-        if k not in ('loss', 'max_length', 'datasets')})
+        if k not in ('loss', 'max_length', 'datasets', 'model_name')})
     return args_dict, train_args
 
 
