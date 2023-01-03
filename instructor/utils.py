@@ -113,10 +113,31 @@ def freeze_top_n_layers(model, target_layers: int):
     return model
 
 
-def argument_parsing(model_name: str,
-        output_dir: Optional[str] = None,
-        parser: Optional[ArgumentParser] = None,
+def load_model(training_conf: Dict[str, Any]):
+    """
+    Loads a model using a name from the training config dictionary returned
+    by the `argument_parsing` function.
+
+    Returns the model object and the number of trainable parameters the model
+    has.
+
+    @param training_conf: the training config dictionary.
+    """
+    
+    model_name = training_conf["model_name"]
+    model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=1, problem_type="regression")
+    if "freeze_layer" in training_conf:
+        num_layer = training_conf["freeze_layer"]
+        model = freeze_top_n_layers(model, num_layer)
+
+    model_parameters = filter(lambda p: p.requires_grad, model.parameters())
+    params = sum([np.prod(p.size()) for p in model_parameters])
+    return model, params
+    
+
+def argument_parsing(parser: Optional[ArgumentParser] = None,
         config_path: Optional[str] = None,
+        output_dir: Optional[str] = None,
         default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS) -> \
             Tuple[Dict[str, Any], TrainingArguments]:
     """
@@ -130,7 +151,6 @@ def argument_parsing(model_name: str,
     This function returns a dictionary of all parameters and a ready to use
     TrainingArguments object.
 
-    @param model_name: name of the model to be used for training.
     @param output_dir: (optional) path to the output directory if you want to change it.
     @param parser:  (optional) ArgumentParser object if the script was invoked from 
         the command line.
@@ -142,14 +162,14 @@ def argument_parsing(model_name: str,
         need to change this.
     """
 
+    assert parser or config_path, "Either a parser or a config path must be specified"
     if parser:
         args = parser.parse_args()
         config_path = args.config
     
-    training_conf = {}
-    if config_path:
-        with open(config_path, "r", encoding="utf-8") as f:
-            training_conf = yaml.safe_load(f.read())
+    with open(config_path, "r", encoding="utf-8") as f:
+        training_conf = yaml.safe_load(f.read())
+    model_name = training_conf["model_name"]
 
     # Merge config params with defaults and fix types
     
@@ -157,6 +177,9 @@ def argument_parsing(model_name: str,
         **{k: __DEFAULT_PARAMS_TYPES.get(k, lambda x: x)(v)
             for k, v in training_conf.items()}}
     
+    # TODO: model_name needs to be escaped for this so it doesn't 
+    #       contain special characters like '/' or ':'. 
+    #       Perhaps use path.split() and then join with '-'?
     output_dir = output_dir or f"{model_name}-finetuned"
     args_dict["output_dir"] = output_dir
 

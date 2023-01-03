@@ -15,13 +15,17 @@ from transformers import (
 )
 
 from .rank_datasets import DataCollatorForPairRank, HFSummary, WebGPT
-from .utils import argument_parsing, freeze_top_n_layers, get_tokenizer, train_val_dataset
+from .utils import (
+    argument_parsing, 
+    get_tokenizer, 
+    train_val_dataset,
+    load_model)
 
 os.environ["WANDB_PROJECT"] = "reward-model"
 
 accuracy = evaluate.load("accuracy")
-parser = ArgumentParser()
-parser.add_argument("config", type=str)
+PARSER = ArgumentParser()
+PARSER.add_argument("config", type=str)
 
 
 def compute_metrics(eval_pred):
@@ -91,41 +95,21 @@ class RankTrainer(Trainer):
         return (loss, logits, labels)
 
 
-if __name__ == "__main__":
-    training_conf = argument_parsing(parser)
+def run_trainer(config_path: str = None, parser: ArgumentParser = None):
 
-    model_name = training_conf["model_name"]
-    model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=1, problem_type="regression")
-    if "freeze_layer" in training_conf:
-        num_layer = training_conf["freeze_layer"]
-        model = freeze_top_n_layers(model, num_layer)
+    assert config_path or parser, "Either config_path or parser must be provided"
 
-    model_parameters = filter(lambda p: p.requires_grad, model.parameters())
-    params = sum([np.prod(p.size()) for p in model_parameters])
-    print("Number of trainable : {}M".format(int(params / 1e6)))
+    if parser:
+        args = parser.parse_args()
+        config_path = args.config
 
-    tokenizer = get_tokenizer(model_name)
-    args = TrainingArguments(
-        output_dir=f"{model_name}-finetuned",
-        num_train_epochs=training_conf["num_train_epochs"],
-        warmup_steps=500,
-        learning_rate=training_conf["learning_rate"],
-        # half_precision_backend="apex",
-        fp16=True,
-        gradient_checkpointing=training_conf["gradient_checkpointing"],
-        gradient_accumulation_steps=training_conf["gradient_accumulation_steps"],
-        per_device_train_batch_size=training_conf["per_device_train_batch_size"],
-        per_device_eval_batch_size=training_conf["per_device_eval_batch_size"],
-        weight_decay=0.01,
-        max_grad_norm=2.0,
-        logging_steps=10,
-        save_total_limit=4,
-        evaluation_strategy="steps",
-        eval_steps=training_conf["eval_steps"],
-        save_steps=1000,
-        report_to="wandb",
-    )
-    
+    training_conf, args = argument_parsing(config_path=config_path)
+
+    model, params = load_model(training_conf)
+    print (f"Model has {params/1e6}M trainable parameters.")
+
+    tokenizer = get_tokenizer(training_conf["model_name"])
+
     train_datasets, evals = [], {}
     if "webgpt" in training_conf["datasets"]:
         web_dataset = WebGPT()
@@ -153,4 +137,8 @@ if __name__ == "__main__":
         tokenizer=tokenizer,
         compute_metrics=compute_metrics,
     )
-    #trainer.train()
+    trainer.train()
+
+
+if __name__ == "__main__":
+    run_trainer(PARSER)
