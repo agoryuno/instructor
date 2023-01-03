@@ -16,6 +16,6 @@ setup(
         "torch",
         "transformers==4.25.1",
         "wandb==0.13.7",
-        "protobuf==3.20.*"
+        "protobuf==3.19.*"
         ]
     )
