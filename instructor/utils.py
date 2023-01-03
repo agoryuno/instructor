@@ -161,8 +161,6 @@ def argument_parsing(model_name: str,
     args_dict["output_dir"] = output_dir
 
     # Exclude all extra arguments
-    print ({k: v for k, v in args_dict.items() 
-        if k not in ('loss', 'max_length', 'datasets', 'model_name')})
     train_args = TrainingArguments(**{k: v for k, v in args_dict.items() 
         if k not in ('loss', 'max_length', 'datasets', 'model_name')})
     return args_dict, train_args
