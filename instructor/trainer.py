@@ -130,7 +130,7 @@ def run_trainer(config_path: str = None, parser: ArgumentParser = None):
     kwargs = dict(
         train_dataset=train, 
         args=training_args,
-        eval_datasets=evals,
+        eval_dataset=evals,
         data_collator=collate_fn,
         tokenizer=tokenizer,
         compute_metrics=compute_metrics,
