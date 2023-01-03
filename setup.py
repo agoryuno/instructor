@@ -17,5 +17,6 @@ setup(
         "transformers==4.25.1",
         "wandb==0.13.7",
         "protobuf==3.20.*"
-        ]
+        ],
+    dependency_links=["https://download.pytorch.org/whl/torch_stable.html"]
     )
