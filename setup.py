@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='instructor',
-    version='0.2.0.4',
+    version='0.2.0.5',
     packages=['instructor'],
     url='',
     license='',
