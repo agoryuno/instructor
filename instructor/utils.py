@@ -29,6 +29,8 @@ DEFAULT_PARAMS = dict(
     logging_steps=10,
     save_total_limit=4,
     evaluation_strategy="steps",
+    save_steps=1000,
+    report_to="wandb",
 )
 
 __DEFAULT_PARAMS_TYPES = dict(
@@ -43,7 +45,8 @@ __DEFAULT_PARAMS_TYPES = dict(
     max_length=int,
     per_device_eval_batch_size=int,
     per_device_train_batch_size=int,
-    gradient_accumulation_steps=int
+    gradient_accumulation_steps=int,
+    save_steps=int,
 )
 
 def webgpt_return_format(row):
@@ -101,8 +104,9 @@ def freeze_top_n_layers(model, target_layers):
     return model
 
 
-def argument_parsing(parser: Optional[ArgumentParser] = None, 
-        default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS) -> TrainingArguments:
+def argument_parsing(model_name: str,
+    parser: Optional[ArgumentParser] = None, 
+    default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS) -> TrainingArguments:
     
     training_conf = {}
     if parser:
@@ -114,6 +118,7 @@ def argument_parsing(parser: Optional[ArgumentParser] = None,
     args_dict = {**default_params, \
         **{k: __DEFAULT_PARAMS_TYPES.get(k, lambda x: x)(v)
             for k, v in training_conf.items()}}
+    args_dict["output_dir"] = f"{model_name}-finetuned"
     return TrainingArguments(**args_dict)
 
 
