@@ -6,24 +6,37 @@ from argparse import ArgumentParser
 import yaml
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Subset
-from transformers import AutoTokenizer
+from torch.nn.modules.container import ModuleList
+from transformers import AutoTokenizer, TrainingArguments
 
 re_reference_remove = re.compile(r"\[\d+(?:,\s*\d+)*?\]")
 
-DEFAULT_PARAMS = {
-        "num_train_epochs": 4,
-        "learning_rate": 3e-5,
-        "eval_steps": 500,
-        "loss": "rank",
-        "max_length": 440,
-        "per_device_eval_batch_size": 5,
-        "per_device_train_batch_size": 8,
-        "gradient_accumulation_steps": 8,
-        "gradient_checkpointing": False,
-        "datasets": ["webgpt"],
-    }
+DEFAULT_PARAMS = dict(
+    warmup_steps=500,
+    num_train_epochs=4,
+    learning_rate=3e-5,
+    eval_steps=500,
+    loss="rank",
+    max_length=440,
+    per_device_eval_batch_size=5,
+    per_device_train_batch_size=8,
+    gradient_accumulation_steps=8,
+    gradient_checkpointing=False,
+    datasets=["webgpt"],
+    fp16=True,
+    weight_decay=0.01,
+    max_grad_norm=2.0,
+    logging_steps=10,
+    save_total_limit=4,
+    evaluation_strategy="steps",
+)
 
 __DEFAULT_PARAMS_TYPES = dict(
+    warmup_steps=int,
+    weight_decay=float,
+    max_grad_norm=float,
+    logging_steps=int,
+    save_total_limit=int,
     num_train_epochs=int,
     learning_rate=float,
     eval_steps=int,
@@ -70,28 +83,26 @@ def train_val_dataset(dataset, val_split=0.2):
 def freeze_top_n_layers(model, target_layers):
     # its possible we can simply detect which module is a ModuleList
     # and simply freeze the module without doing string parsing
+
+    # This should do just that ^
+
+    # Freeze embedding layers
     for name, param in model.named_parameters():
         if "embed" in name:
             param.requires_grad = False
-        elif ".layer" in name or ".h." in name:
-            tokens = name.split(".")
-            idx = 0
-            for token in tokens:
-                if "layer" in token or token == "h":
-                    break
-                idx += 1
-            if idx >= len(tokens):
-                continue
-
-            layer_ = int(tokens[idx + 1])
-            if layer_ < target_layers:
-                # print('freeze ', layer_, name)
-                param.requires_grad = False
+    
+    # Freeze the first `target_layers` number of layers
+    for _,module in model.named_modules():
+        if isinstance(module, ModuleList):
+            for pname, param in module.named_parameters():
+                if int(pname.split(".")[0]) < target_layers:
+                    param.requires_grad = False
+        
     return model
 
 
 def argument_parsing(parser: Optional[ArgumentParser] = None, 
-        default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS):
+        default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS) -> TrainingArguments:
     
     training_conf = {}
     if parser:
@@ -99,10 +110,11 @@ def argument_parsing(parser: Optional[ArgumentParser] = None,
         with open(args.config, "r", encoding="utf-8") as f:
             training_conf = yaml.safe_load(f.read())
 
-    # Merge config params with defaults, fix types and return
-    return {**default_params, \
+    # Merge config params with defaults and fix types
+    args_dict = {**default_params, \
         **{k: __DEFAULT_PARAMS_TYPES.get(k, lambda x: x)(v)
             for k, v in training_conf.items()}}
+    return TrainingArguments(**args_dict)
 
 
 

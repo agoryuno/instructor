@@ -99,9 +99,10 @@ if __name__ == "__main__":
     if "freeze_layer" in training_conf:
         num_layer = training_conf["freeze_layer"]
         model = freeze_top_n_layers(model, num_layer)
-        model_parameters = filter(lambda p: p.requires_grad, model.parameters())
-        params = sum([np.prod(p.size()) for p in model_parameters])
-        print("Number of trainable : {}M".format(int(params / 1e6)))
+
+    model_parameters = filter(lambda p: p.requires_grad, model.parameters())
+    params = sum([np.prod(p.size()) for p in model_parameters])
+    print("Number of trainable : {}M".format(int(params / 1e6)))
 
     tokenizer = get_tokenizer(model_name)
     args = TrainingArguments(
@@ -124,6 +125,7 @@ if __name__ == "__main__":
         save_steps=1000,
         report_to="wandb",
     )
+    
     train_datasets, evals = [], {}
     if "webgpt" in training_conf["datasets"]:
         web_dataset = WebGPT()
