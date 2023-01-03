@@ -152,14 +152,18 @@ def argument_parsing(model_name: str,
             training_conf = yaml.safe_load(f.read())
 
     # Merge config params with defaults and fix types
-    # Exclude the loss argument because it's not a TrainingArguments parameter
-    args_dict = {**{k: v for k,v in default_params.items() if k != "loss"}, \
+    
+    args_dict = {**default_params, \
         **{k: __DEFAULT_PARAMS_TYPES.get(k, lambda x: x)(v)
             for k, v in training_conf.items()}}
     
     output_dir = output_dir or f"{model_name}-finetuned"
     args_dict["output_dir"] = output_dir
-    return args_dict, TrainingArguments(**args_dict)
+
+    # Exclude all extra arguments
+    train_args = TrainingArguments(**{k: v for k, v in args_dict.items() 
+        if k not in ('loss', 'max_length')})
+    return args_dict, train_args
 
 
 
