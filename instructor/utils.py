@@ -154,8 +154,8 @@ def argument_parsing(parser: Optional[ArgumentParser] = None,
         extra_params: Optional[Tuple] = EXTRA_PARAMS) -> \
             Tuple[Dict[str, Any], TrainingArguments]:
     """
-    Collects default parameters and the ones from a config file into a dict with 
-    full config options and a TrainingArguments object.
+    Collects default parameters and the ones from a config file into a dict,
+    returning the dictionary with full options and a TrainingArguments object.
     
     Config file can be specified either as a command line argument or as a string,
     depending on whether you are running the training script from the command line
