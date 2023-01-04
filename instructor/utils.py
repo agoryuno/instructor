@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import os
 from typing import Dict, Any, Optional, Tuple
 from argparse import ArgumentParser
 
@@ -14,7 +15,9 @@ from transformers import (
     AutoModelForSequenceClassification
 )
 
+
 re_reference_remove = re.compile(r"\[\d+(?:,\s*\d+)*?\]")
+
 
 DEFAULT_PARAMS = dict(
     warmup_steps=500,
@@ -38,6 +41,7 @@ DEFAULT_PARAMS = dict(
     report_to="wandb",
 )
 
+
 __DEFAULT_PARAMS_TYPES = dict(
     warmup_steps=int,
     weight_decay=float,
@@ -54,9 +58,11 @@ __DEFAULT_PARAMS_TYPES = dict(
     save_steps=int,
 )
 
+
 # Config parameters that are not passed to the TrainingArguments
 EXTRA_PARAMS  = ('loss', 'max_length', 'datasets', 
               'model_name', "freeze_layer")
+
 
 def webgpt_return_format(row):
     res = {"question": row["question"]["full_text"]}
@@ -188,16 +194,14 @@ def argument_parsing(parser: Optional[ArgumentParser] = None,
         **{k: __DEFAULT_PARAMS_TYPES.get(k, lambda x: x)(v)
             for k, v in training_conf.items()}}
     
-    # TODO: model_name needs to be escaped for this so it doesn't 
-    #       contain special characters like '/' or ':'. 
-    #       Perhaps use path.split() and then join with '-'?
-    output_dir = output_dir or f"{model_name}-finetuned"
+    default_dir = os.path.normpath(f"{model_name}-finetuned")
+    default_dir = "-".join(os.path.split(default_dir))
+    output_dir = output_dir or default_dir
     args_dict["output_dir"] = output_dir
 
     train_args = TrainingArguments(**{k: v for k, v in args_dict.items() 
         if k not in extra_params})
     return args_dict, train_args
-
 
 
 if __name__ == "__main__":
