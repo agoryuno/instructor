@@ -54,6 +54,10 @@ __DEFAULT_PARAMS_TYPES = dict(
     save_steps=int,
 )
 
+# Config parameters that are not passed to the TrainingArguments
+EXTRA_PARAMS  = ('loss', 'max_length', 'datasets', 
+              'model_name', "freeze_layer")
+
 def webgpt_return_format(row):
     res = {"question": row["question"]["full_text"]}
     row["answer_0"] = re_reference_remove.sub("", row["answer_0"])
@@ -140,7 +144,8 @@ def load_model(training_conf: Dict[str, Any]):
 def argument_parsing(parser: Optional[ArgumentParser] = None,
         config_path: Optional[str] = None,
         output_dir: Optional[str] = None,
-        default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS) -> \
+        default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS,
+        extra_params: Optional[Tuple] = EXTRA_PARAMS) -> \
             Tuple[Dict[str, Any], TrainingArguments]:
     """
     Collects default parameters and the ones from a config file into a dict with 
@@ -162,8 +167,10 @@ def argument_parsing(parser: Optional[ArgumentParser] = None,
         config file path will be taken from the 'config' argument of the parser
         and this parameter will be ignored.
     @param output_dir: (optional) path to the output directory if you want to change it.
-    @param default_params: (optional) default training parameters - you don't really
-        need to change this.
+    @param default_params: (optional) default training parameters. Default:
+        utils.DEFAULT_PARAMS
+    @param extra_params: (optional) extra parameters that are not passed to the 
+        TrainingArguments object. Default: utils.EXTRA_PARAMS
     """
 
     assert parser or config_path, "Either a parser or a config path must be specified"
@@ -187,11 +194,8 @@ def argument_parsing(parser: Optional[ArgumentParser] = None,
     output_dir = output_dir or f"{model_name}-finetuned"
     args_dict["output_dir"] = output_dir
 
-    # Exclude all extra arguments
-    extras = ('loss', 'max_length', 'datasets', 
-              'model_name', "freeze_layer")
     train_args = TrainingArguments(**{k: v for k, v in args_dict.items() 
-        if k not in extras})
+        if k not in extra_params})
     return args_dict, train_args
 
 
