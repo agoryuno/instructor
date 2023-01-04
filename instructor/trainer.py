@@ -132,17 +132,16 @@ def run_trainer(config_path: str = None, parser: ArgumentParser = None):
     )
     assert len(evals) > 0
     
-    kwargs = dict(
-        train_dataset=train, 
-        args=training_args,
-        eval_dataset=evals,
-        data_collator=collate_fn,
-        tokenizer=tokenizer,
-        compute_metrics=compute_metrics,
-        model=model,)
     trainer = RankTrainer(
         loss_function=training_conf["loss"],
-        **kwargs,
+        **dict(
+            train_dataset=train,
+            args=training_args,
+            eval_dataset=evals,
+            data_collator=collate_fn,
+            tokenizer=tokenizer,
+            compute_metrics=compute_metrics,
+            model=model),
     )
     trainer.train()
 
