@@ -49,8 +49,20 @@ class DataCollatorForPairRank:
         batch_size = 0
         for question, pairs in features:
             for (pos, neg) in pairs:
-                flatten_features.append(self.tokenizer(question, pos, truncation=True, max_length=self.max_length))
-                flatten_features.append(self.tokenizer(question, neg, truncation=True, max_length=self.max_length))
+                flatten_features.append(
+                    self.tokenizer(
+                        question, 
+                        pos, 
+                        truncation=True, 
+                        max_length=self.max_length)
+                    )
+                flatten_features.append(
+                    self.tokenizer(
+                        question, 
+                        neg, 
+                        truncation=True, 
+                        max_length=self.max_length)
+                    )
                 batch_size += 1
 
         batch = self.tokenizer.pad(

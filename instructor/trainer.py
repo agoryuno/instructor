@@ -58,7 +58,10 @@ class RankTrainer(Trainer):
         if self.loss_function == "rank":
             loss = self.loss_fct(logits[:, 0], logits[:, 1])
         else:
-            loss = self.loss_fct(logits, torch.zeros(logits.shape[0], device=logits.device, dtype=torch.long))
+            loss = self.loss_fct(logits, 
+                torch.zeros(logits.shape[0], 
+                    device=logits.device, 
+                    dtype=torch.long))
 
         return (loss, outputs) if return_outputs else loss
 
@@ -110,7 +113,7 @@ def run_trainer(config_path: str = None,
 
     training_conf, training_args = argument_parsing(config_path=config_path)
 
-    model = load_model(training_conf)
+    model = load_model(training_conf["model_name"])
 
     tokenizer = get_tokenizer(training_conf["model_name"])
 
@@ -132,7 +135,7 @@ def run_trainer(config_path: str = None,
         drop_token_type="galactica" in training_conf["model_name"]
     )
     assert len(evals) > 0
-    
+
     trainer = RankTrainer(
         loss_function=training_conf["loss"],
         **dict(

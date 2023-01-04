@@ -80,9 +80,12 @@ def webgpt_return_format(row):
 
 
 def get_tokenizer(tokenizer_name):
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name,
+                                              use_fast="galactica" not in tokenizer_name)
     if "galactica" in tokenizer_name:
         tokenizer.add_special_tokens({"pad_token": "<pad>", "eos_token": "</s>"})
+    
+    
 
     return tokenizer
 
