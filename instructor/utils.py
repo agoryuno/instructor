@@ -188,8 +188,10 @@ def argument_parsing(parser: Optional[ArgumentParser] = None,
     args_dict["output_dir"] = output_dir
 
     # Exclude all extra arguments
+    extras = ('loss', 'max_length', 'datasets', 
+              'model_name', "freeze_layer")
     train_args = TrainingArguments(**{k: v for k, v in args_dict.items() 
-        if k not in ('loss', 'max_length', 'datasets', 'model_name')})
+        if k not in extras})
     return args_dict, train_args
 
 

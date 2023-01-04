@@ -93,7 +93,8 @@ class RankTrainer(Trainer):
         return (loss, logits, labels)
 
 
-def run_trainer(config_path: str = None, parser: ArgumentParser = None):
+def run_trainer(config_path: str = None, 
+        parser: ArgumentParser = None):
     """
     Runs the trainer.
     
