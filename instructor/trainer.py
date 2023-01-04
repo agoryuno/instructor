@@ -94,6 +94,12 @@ class RankTrainer(Trainer):
 
 
 def run_trainer(config_path: str = None, parser: ArgumentParser = None):
+    """
+    Runs the trainer.
+    
+    Provide the configuration as either a path to a yaml file 
+    or as an argparse parser if running from the command line.
+    """
 
     assert config_path or parser, "Either config_path or parser must be provided"
 
