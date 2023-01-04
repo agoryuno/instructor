@@ -123,8 +123,7 @@ def load_model(training_conf: Dict[str, Any]):
     Loads a model using a name from the training config dictionary returned
     by the `argument_parsing` function.
 
-    Returns the model object and the number of trainable parameters the model
-    has.
+    Returns the model object.
 
     @param training_conf: the training config dictionary.
     """
@@ -135,9 +134,7 @@ def load_model(training_conf: Dict[str, Any]):
         num_layer = training_conf["freeze_layer"]
         model = freeze_top_n_layers(model, num_layer)
 
-    model_parameters = filter(lambda p: p.requires_grad, model.parameters())
-    params = sum([np.prod(p.size()) for p in model_parameters])
-    return model, params
+    return model
     
 
 def argument_parsing(parser: Optional[ArgumentParser] = None,
