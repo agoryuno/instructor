@@ -172,11 +172,6 @@ def argument_parsing(config_path: str,
         TrainingArguments object. Default: utils.EXTRA_PARAMS
     """
 
-    assert parser or config_path, "Either a parser or a config path must be specified"
-    if parser:
-        args = parser.parse_args()
-        config_path = args.config
-    
     with open(config_path, "r", encoding="utf-8") as f:
         training_conf = yaml.safe_load(f.read())
     model_name = training_conf["model_name"]
