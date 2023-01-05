@@ -71,6 +71,7 @@ class DataCollatorForPairRank:
             max_length=self.max_length,
             pad_to_multiple_of=self.pad_to_multiple_of,
             return_tensors="pt",
+            padding="max_length",
         )
         if self.drop_token_type:
             batch.pop("token_type_ids")

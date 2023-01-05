@@ -85,8 +85,6 @@ def get_tokenizer(tokenizer_name):
     if "galactica" in tokenizer_name:
         tokenizer.add_special_tokens({"pad_token": "<pad>", "eos_token": "</s>"})
     
-    
-
     return tokenizer
 
 
@@ -142,7 +140,9 @@ def load_model(training_conf: Dict[str, Any]):
     """
     
     model_name = training_conf["model_name"]
-    model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=1, problem_type="regression")
+    model = AutoModelForSequenceClassification.from_pretrained(model_name, 
+        num_labels=1, 
+        problem_type="regression")
     if "freeze_layer" in training_conf:
         num_layer = training_conf["freeze_layer"]
         model = freeze_top_n_layers(model, num_layer)
