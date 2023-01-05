@@ -10,12 +10,20 @@ from torch import nn
 from torch.utils.data import ConcatDataset
 from transformers import Trainer
 
-from .rank_datasets import DataCollatorForPairRank, HFSummary, WebGPT
-from .utils import (
-    argument_parsing, 
-    get_tokenizer, 
-    train_val_dataset,
-    load_model)
+try:
+    from .rank_datasets import DataCollatorForPairRank, HFSummary, WebGPT
+    from .utils import (
+        argument_parsing, 
+        get_tokenizer, 
+        train_val_dataset,
+        load_model)
+except ImportError:
+    from rank_datasets import DataCollatorForPairRank, HFSummary, WebGPT
+    from utils import (
+        argument_parsing, 
+        get_tokenizer, 
+        train_val_dataset,
+        load_model)
 
 os.environ["WANDB_PROJECT"] = "reward-model"
 
