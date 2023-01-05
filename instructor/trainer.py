@@ -113,7 +113,7 @@ def run_trainer(config_path: str = None,
 
     training_conf, training_args = argument_parsing(config_path=config_path)
 
-    model = load_model(training_conf["model_name"])
+    model = load_model(training_conf)
 
     tokenizer = get_tokenizer(training_conf["model_name"])
 
