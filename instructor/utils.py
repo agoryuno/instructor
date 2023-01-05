@@ -150,8 +150,7 @@ def load_model(training_conf: Dict[str, Any]):
     return model
     
 
-def argument_parsing(parser: Optional[ArgumentParser] = None,
-        config_path: Optional[str] = None,
+def argument_parsing(config_path: str,
         output_dir: Optional[str] = None,
         default_params: Optional[Dict[str, Any]] = DEFAULT_PARAMS,
         extra_params: Optional[Tuple] = EXTRA_PARAMS) -> \
@@ -159,22 +158,13 @@ def argument_parsing(parser: Optional[ArgumentParser] = None,
     """
     Collects default parameters and the ones from a config file into a dict,
     returning the dictionary with full options and a TrainingArguments object.
-    
-    Config file can be specified either as a command line argument or as a string,
-    depending on whether you are running the training script from the command line
-    of as a module.
 
     All parameters have sensible defaults.
 
     This function returns a dictionary of all parameters and a ready to use
     TrainingArguments object.
     
-    @param parser:  (optional) ArgumentParser object if the script was invoked from 
-        the command line.
-    @param config_path: (optional) path to the config file with training parameters if 
-        running as an imported module. If both this and a parser are specified, the
-        config file path will be taken from the 'config' argument of the parser
-        and this parameter will be ignored.
+    @param config_path: path to the config file with training parameters .
     @param output_dir: (optional) path to the output directory if you want to change it.
     @param default_params: (optional) default training parameters. Default:
         utils.DEFAULT_PARAMS

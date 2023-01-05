@@ -104,22 +104,14 @@ class RankTrainer(Trainer):
         return (loss, logits, labels)
 
 
-def run_trainer(config_path: str = None, 
-        parser: ArgumentParser = None):
+def run_trainer(config_path: str):
     """
     Runs the trainer.
     
-    Provide the configuration as either a path to a yaml file 
-    or as an argparse parser if running from the command line.
+    @param config_path: Path to the config file.
     """
 
-    assert config_path or parser, "Either config_path or parser must be provided"
-
-    if parser:
-        args = parser.parse_args()
-        config_path = args.config
-
-    training_conf, training_args = argument_parsing(config_path=config_path)
+    training_conf, training_args = argument_parsing(config_path)
 
     model = load_model(training_conf)
 
@@ -159,4 +151,5 @@ def run_trainer(config_path: str = None,
 
 
 if __name__ == "__main__":
-    run_trainer(PARSER)
+    args = PARSER.parse_args()
+    run_trainer(args.config)
