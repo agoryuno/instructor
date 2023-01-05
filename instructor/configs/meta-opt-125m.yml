@@ -1,5 +1,4 @@
 model_name: facebook/opt-125m
-freeze_layer: 10
 learning_rate: 1e-5
 gradient_checkpointing: false
 gradient_accumulation_steps: 32
